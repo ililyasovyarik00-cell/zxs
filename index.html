@@ -4,124 +4,136 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Полёт струи под углом</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#eef3f6;--card:#fff;--ink:#12263a;--mute:#5b6f80;--line:#cdd8e0;--c30:#1f77b4;--c60:#d9480f;--c99:#2f9e44;--grid:#dde6ec}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a24;--card:#152532;--ink:#e6eef4;--mute:#93a7b6;--line:#294052;--c30:#5aa9e6;--c60:#ff8a5c;--c99:#69db7c;--grid:#1f3444}}
-:root[data-theme="dark"]{--bg:#0e1a24;--card:#152532;--ink:#e6eef4;--mute:#93a7b6;--line:#294052;--c30:#5aa9e6;--c60:#ff8a5c;--c99:#69db7c;--grid:#1f3444}
+--bg:#fff0f5;--bg2:#ffd3e3;--card:rgba(255,255,255,.74);--ink:#4a1d33;--mute:#8a5470;--line:rgba(120,40,80,.14);
+--ac:#d6336c;--ac2:#f06595;--cv:#fff3f7;--grid:#f4cfdd;--chip:#ffe3ee;
+--fh:"Unbounded","Trebuchet MS",system-ui,sans-serif;--fb:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;--fm:"JetBrains Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1020;--bg2:#4a1a35;--card:rgba(80,30,58,.72);--ink:#ffe8f1;--mute:#e3adc4;--line:rgba(255,170,205,.2);--ac:#e8498a;--ac2:#ff8fb8;--cv:#3a1529;--grid:#5a2845;--chip:#5a2442}}
+:root[data-theme="dark"]{--bg:#2a1020;--bg2:#4a1a35;--card:rgba(80,30,58,.72);--ink:#ffe8f1;--mute:#e3adc4;--line:rgba(255,170,205,.2);--ac:#e8498a;--ac2:#ff8fb8;--cv:#3a1529;--grid:#5a2845;--chip:#5a2442}
 *{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,"Times New Roman",serif}
-main{max-width:860px;margin:0 auto;padding:18px 14px 40px}
-h1{font-size:1.6rem;margin:0 0 4px;line-height:1.2}
-h2{font-size:1.15rem;margin:0 0 8px}
-.sub{color:var(--mute);margin:0 0 14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
-canvas{width:100%;height:auto;display:block;border-radius:6px}
-.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:10px;font-family:system-ui,sans-serif;font-size:.95rem}
-.ctl input[type=range]{flex:1;min-width:160px}
-button{font:inherit;font-family:system-ui,sans-serif;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:3px solid var(--c30);outline-offset:2px}
-.leg{display:flex;flex-wrap:wrap;gap:14px;font-family:system-ui,sans-serif;font-size:.9rem;margin-top:8px}
-.leg i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
-.tw{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.9rem;min-width:480px}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
-th:first-child,td:first-child{text-align:left}
-.law{margin:0 0 12px}
-.f{font-family:"Cambria Math",Georgia,serif;font-size:1.05rem;background:var(--bg);padding:6px 10px;border-radius:6px;display:block;margin:4px 0;overflow-x:auto;white-space:nowrap}
-.note{color:var(--mute);font-size:.92rem}
-footer{text-align:center;font-weight:bold;padding:14px;border:2px solid var(--ink);border-radius:10px;margin-top:20px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body::before{content:"";position:fixed;top:0;right:0;width:min(100%,520px);height:300px;z-index:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 300'%3E%3Cdefs%3E%3Cg id='f'%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(72)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(144)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(216)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(288)'/%3E%3Ccircle r='3.5' fill='%23e63e7a'/%3E%3C/g%3E%3C/defs%3E%3Cpath d='M500 30 C400 60 340 30 260 100 S120 140 40 110' stroke='%236b3a2a' stroke-width='10' fill='none' stroke-linecap='round'/%3E%3Cpath d='M340 48 C318 110 300 140 286 190' stroke='%236b3a2a' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cuse href='%23f' transform='translate(470,36) scale(1.5)'/%3E%3Cuse href='%23f' transform='translate(410,58) scale(1.2)'/%3E%3Cuse href='%23f' transform='translate(350,44) scale(1.6)'/%3E%3Cuse href='%23f' transform='translate(300,96) scale(1.3)'/%3E%3Cuse href='%23f' transform='translate(230,112) scale(1.5)'/%3E%3Cuse href='%23f' transform='translate(160,126) scale(1.2)'/%3E%3Cuse href='%23f' transform='translate(90,116) scale(1.4)'/%3E%3Cuse href='%23f' transform='translate(40,108) scale(1.1)'/%3E%3Cuse href='%23f' transform='translate(286,186) scale(1.1)'/%3E%3Cuse href='%23f' transform='translate(380,90) scale(1)'/%3E%3C/svg%3E") top right/100% 100% no-repeat}
+.petal{position:fixed;top:-24px;z-index:0;pointer-events:none;background:#ffc2d6;border-radius:80% 0 80% 0;opacity:.8;animation:fall linear infinite}
+@keyframes fall{to{transform:translate(70px,112vh) rotate(420deg)}}
+body{margin:0;min-height:100%;background:radial-gradient(circle at 12% 10%,rgba(255,150,190,.35),transparent 45%),radial-gradient(circle at 92% 70%,rgba(246,101,149,.22),transparent 50%),linear-gradient(165deg,var(--bg),var(--bg2)) fixed;color:var(--ink);font:400 16px/1.55 var(--fb);-webkit-font-smoothing:antialiased}
+main{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:22px 14px 40px}
+.eyebrow{font:600 .72rem var(--fb);letter-spacing:.18em;text-transform:uppercase;color:var(--ac)}
+h1{font:700 1.55rem/1.2 var(--fh);margin:6px 0 8px;letter-spacing:-.01em}
+h2{font:700 1.02rem var(--fh);margin:0 0 14px}
+.sub{color:var(--mute);margin:0 0 18px}
+.card{background:var(--card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:16px;box-shadow:0 8px 30px rgba(120,30,70,.1)}
+canvas{width:100%;height:auto;display:block;border-radius:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 460' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3Cg id='f'%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(72)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(144)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(216)'/%3E%3Cellipse cy='-11' rx='8' ry='12' fill='%23ffc9db' stroke='%23f08ab0' transform='rotate(288)'/%3E%3Ccircle r='3.5' fill='%23e63e7a'/%3E%3C/g%3E%3C/defs%3E%3Crect width='800' height='460' fill='%23ffe6ef'/%3E%3Crect width='800' height='230' fill='%23fff3f7' fill-opacity='.7'/%3E%3Cpath d='M800 38 C710 62 650 36 570 92 S430 122 350 98' stroke='%236b3a2a' stroke-width='9' fill='none' stroke-linecap='round'/%3E%3Cpath d='M650 50 C628 100 610 120 596 165' stroke='%236b3a2a' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M0 66 C90 52 130 104 210 84 S300 70 330 96' stroke='%236b3a2a' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cuse href='%23f' transform='translate(760,48) scale(1.3)'/%3E%3Cuse href='%23f' transform='translate(700,64) scale(1.1)'/%3E%3Cuse href='%23f' transform='translate(640,50) scale(1.4)'/%3E%3Cuse href='%23f' transform='translate(590,100) scale(1.2)'/%3E%3Cuse href='%23f' transform='translate(520,106) scale(1.3)'/%3E%3Cuse href='%23f' transform='translate(440,116) scale(1.1)'/%3E%3Cuse href='%23f' transform='translate(596,162) scale(1)'/%3E%3Cuse href='%23f' transform='translate(30,62) scale(1.2)'/%3E%3Cuse href='%23f' transform='translate(100,80) scale(1.4)'/%3E%3Cuse href='%23f' transform='translate(180,92) scale(1.1)'/%3E%3Cuse href='%23f' transform='translate(270,82) scale(1.3)'/%3E%3Cuse href='%23f' transform='translate(330,98) scale(1)'/%3E%3Cg fill='%23ffc9db' stroke='%23f08ab0'%3E%3Cellipse cx='300' cy='200' rx='5' ry='8' transform='rotate(40 300 200)'/%3E%3Cellipse cx='480' cy='260' rx='5' ry='8' transform='rotate(-30 480 260)'/%3E%3Cellipse cx='160' cy='300' rx='5' ry='8' transform='rotate(70 160 300)'/%3E%3Cellipse cx='680' cy='320' rx='5' ry='8' transform='rotate(10 680 320)'/%3E%3Cellipse cx='400' cy='360' rx='5' ry='8' transform='rotate(-60 400 360)'/%3E%3Cellipse cx='90' cy='180' rx='5' ry='8' transform='rotate(25 90 180)'/%3E%3Cellipse cx='740' cy='200' rx='5' ry='8' transform='rotate(-45 740 200)'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat}
+.ctl{margin-top:16px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.lab{color:var(--mute);font-weight:600;font-size:.9rem}
+.big{font:700 2.1rem var(--fh);color:var(--ac)}
+.big small{font-size:1rem;margin-left:2px}
+.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:5px 12px;font:600 .85rem var(--fb)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--ac2));margin:14px 0 6px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:4px solid var(--ac);box-shadow:0 3px 10px rgba(0,0,0,.25)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--ac)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--ac2);outline-offset:3px}
+.ticks{display:flex;justify-content:space-between;color:var(--mute);font:500 .75rem var(--fm)}
+button{width:100%;margin-top:16px;font:800 1rem var(--fb);color:#fff;background:linear-gradient(90deg,var(--ac),var(--ac2));border:0;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 6px 18px rgba(214,51,108,.35)}
+button:active{transform:scale(.98)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--chip);border-radius:16px;padding:12px 8px;text-align:center}
+.tile b{display:block;font:700 1.25rem var(--fh);color:var(--ac)}
+.tile span{font-size:.75rem;color:var(--mute);font-weight:600}
+.note{color:var(--mute);font-size:.88rem;margin:14px 0 0}
+.law{display:flex;gap:12px;margin-bottom:16px}
+.n{flex:none;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font:700 .85rem var(--fh);display:grid;place-items:center}
+.law p{margin:0 0 4px}
+.law b{font-weight:800}
+.f{font:500 .92rem var(--fm);background:var(--chip);padding:7px 11px;border-radius:10px;display:block;margin:5px 0;overflow-x:auto;white-space:nowrap}
+footer{text-align:center;font:700 .88rem/1.5 var(--fh);padding:18px 14px;border-radius:22px;color:#fff;background:linear-gradient(120deg,#c2255c,#f783ac);margin-top:20px;box-shadow:0 8px 24px rgba(194,37,92,.35)}
 </style>
 </head>
 <body>
 <main>
+<div class="eyebrow">🌸 Физика · Баллистика струи</div>
 <h1>Зависимость полёта струи от угла наклона</h1>
-<p class="sub">Струя вылетает из сопла под выбранным углом к горизонту. Сопротивлением воздуха пренебрегаем.</p>
+<p class="sub">Струя вылетает из сопла со скоростью 10 м/с. Меняйте угол и смотрите, как меняется траектория. Сопротивление воздуха не учитывается.</p>
 
 <section class="card">
-<canvas id="cv" width="800" height="440" aria-label="Траектории струи"></canvas>
-<div class="leg" id="leg"></div>
+<canvas id="cv" width="800" height="460" aria-label="Траектория струи"></canvas>
 <div class="ctl">
-<span>Скорость v₀ = <b>10 м/с</b> (постоянная)</span>
-<input id="v" type="hidden" value="10">
-<label for="ang">Угол наклона: <b id="av">45</b>°</label>
+<div class="row"><label class="lab" for="ang">Угол наклона</label><div class="big"><span id="av">45</span><small>°</small></div></div>
 <input id="ang" type="range" min="0" max="180" step="1" value="45">
-<button id="play">Запустить струю</button>
+<div class="ticks"><span>0°</span><span>45°</span><span>90°</span><span>135°</span><span>180°</span></div>
+<button id="play">▶ Запустить струю</button>
 </div>
 </section>
 
 <section class="card">
-<h2>Результаты расчёта</h2>
-<div class="tw"><table>
-<thead><tr><th>Угол</th><th>Время полёта, с</th><th>Макс. высота, м</th><th>Дальность по x, м</th></tr></thead>
-<tbody id="tb"></tbody></table></div>
-<p class="note">При 90° струя бьёт строго вверх и падает обратно (дальность 0). При углах больше 90° струя летит назад, и дальность отрицательна. Наибольшая дальность на ровной земле — при 45°; 30° и 60° дают одинаковую дальность (углы в сумме 90°).</p>
+<h2>Результаты</h2>
+<div class="tiles">
+<div class="tile"><b id="sT">0</b><span>время, с</span></div>
+<div class="tile"><b id="sH">0</b><span>высота, м</span></div>
+<div class="tile"><b id="sL">0</b><span>дальность, м</span></div>
+</div>
+<p class="note">При 90° струя бьёт строго вверх и падает обратно (дальность 0). При углах больше 90° струя летит назад, и дальность отрицательна. Наибольшая дальность на ровной земле — при 45°; углы 30° и 60° дают одинаковую дальность (в сумме 90°).</p>
 </section>
 
 <section class="card">
-<h2>Физические законы и формулы</h2>
-<div class="law"><b>1. Второй закон Ньютона.</b> Единственная сила, действующая на частицу воды в полёте, — сила тяжести, поэтому ускорение постоянно:
-<span class="f">F = m·a,  a<sub>x</sub> = 0,  a<sub>y</sub> = −g,  g ≈ 9,81 м/с²</span></div>
-<div class="law"><b>2. Принцип независимости движений (Галилей).</b> Движение по горизонтали и по вертикали происходит независимо. Начальная скорость раскладывается на составляющие:
-<span class="f">v₀ₓ = v₀·cos α,  v₀ᵧ = v₀·sin α</span></div>
-<div class="law"><b>3. Равномерное движение по горизонтали:</b>
-<span class="f">x = v₀·cos α · t</span></div>
-<div class="law"><b>4. Равноускоренное движение по вертикали:</b>
-<span class="f">y = v₀·sin α · t − g·t²/2,   v<sub>y</sub> = v₀·sin α − g·t</span></div>
-<div class="law"><b>5. Уравнение траектории</b> (исключаем t) — парабола:
-<span class="f">y = x·tg α − g·x² / (2·v₀²·cos²α)</span></div>
-<div class="law"><b>6. Характеристики полёта:</b>
-<span class="f">t = 2·v₀·sin α / g</span>
-<span class="f">H = v₀²·sin²α / (2g)</span>
-<span class="f">L = v₀²·sin 2α / g</span></div>
-<div class="law"><b>7. Закон сохранения механической энергии.</b> Без трения полная энергия частицы постоянна:
-<span class="f">m·v₀²/2 = m·v²/2 + m·g·y</span></div>
-<div class="law"><b>8. Закон Паскаля / уравнение Бернулли</b> объясняют начальную скорость струи из сопла: давление в жидкости превращается в кинетическую энергию, v₀ = √(2Δp/ρ).</div>
+<h2>Законы физики</h2>
+<div class="law"><div class="n">1</div><div><p><b>Второй закон Ньютона.</b> В полёте на частицу воды действует только сила тяжести, поэтому ускорение постоянно.</p><span class="f">F = m·a,  aₓ = 0,  aᵧ = −g,  g ≈ 9,81 м/с²</span></div></div>
+<div class="law"><div class="n">2</div><div><p><b>Независимость движений (Галилей).</b> По горизонтали и вертикали частица движется независимо. Скорость раскладывается на составляющие.</p><span class="f">v₀ₓ = v₀·cos α,  v₀ᵧ = v₀·sin α</span></div></div>
+<div class="law"><div class="n">3</div><div><p><b>Равномерное движение по горизонтали.</b></p><span class="f">x = v₀·cos α · t</span></div></div>
+<div class="law"><div class="n">4</div><div><p><b>Равноускоренное движение по вертикали.</b></p><span class="f">y = v₀·sin α · t − g·t²/2</span><span class="f">vᵧ = v₀·sin α − g·t</span></div></div>
+<div class="law"><div class="n">5</div><div><p><b>Уравнение траектории</b> (исключаем t) — парабола.</p><span class="f">y = x·tg α − g·x² / (2v₀²·cos²α)</span></div></div>
+<div class="law"><div class="n">6</div><div><p><b>Характеристики полёта.</b></p><span class="f">t = 2·v₀·sin α / g</span><span class="f">H = v₀²·sin²α / (2g)</span><span class="f">L = v₀²·sin 2α / g</span></div></div>
+<div class="law"><div class="n">7</div><div><p><b>Сохранение механической энергии.</b> Без трения полная энергия постоянна.</p><span class="f">m·v₀²/2 = m·v²/2 + m·g·y</span></div></div>
+<div class="law"><div class="n">8</div><div><p><b>Закон Паскаля и уравнение Бернулли</b> объясняют скорость струи у сопла: давление жидкости переходит в кинетическую энергию.</p><span class="f">v₀ = √(2Δp / ρ)</span></div></div>
 </section>
 
-<footer>Работа обучающегося 1 курса группы 1РУПО2 Мысенко Дмитрия</footer>
+<footer>Работа обучающегося 1 курса<br>группы 1РУПО2 Мысенко Дмитрия</footer>
 </main>
 <script>
-const g=9.81,cols=['--c30'],angs=[45];
+const g=9.81,V=10;
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-const vIn=document.getElementById('v'),vv=document.getElementById('vv');
-let prog=1,raf=null;
+let ang=45,prog=1,raf=null;
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-function calc(v,a){const r=a*Math.PI/180,vx=v*Math.cos(r),vy=v*Math.sin(r);
- return{vx,vy,T:2*vy/g,H:vy*vy/(2*g),L:v*v*Math.sin(2*r)/g}}
-function table(v){document.getElementById('tb').innerHTML=angs.map((a,i)=>{const c=calc(v,a);
- return `<tr><td style="color:${css(cols[i])};font-weight:bold">${a}°</td><td>${c.T.toFixed(2)}</td><td>${c.H.toFixed(2)}</td><td>${c.L.toFixed(2)}</td></tr>`}).join('')}
+function calc(a){const r=a*Math.PI/180,vx=V*Math.cos(r),vy=V*Math.sin(r);
+ return{vx,vy,T:2*vy/g,H:vy*vy/(2*g),L:V*V*Math.sin(2*r)/g}}
+function stats(){const c=calc(ang);
+ document.getElementById('sT').textContent=c.T.toFixed(2);
+ document.getElementById('sH').textContent=c.H.toFixed(2);
+ document.getElementById('sL').textContent=(Math.abs(c.L)<0.005?0:c.L).toFixed(2)}
 function draw(){
- const W=cv.width,Hh=cv.height,v=+vIn.value;
- const res=angs.map(a=>calc(v,a));
- const maxR=Math.max(...res.map(r=>Math.max(r.L,0)),1),maxH=Math.max(...res.map(r=>r.H),1);
- const backR=Math.max(...res.map(r=>Math.max(-r.L,0)));
- const ox=40+backR/(maxR+backR+0.001)*0+ (backR>0?Math.min(150,W*0.2):0),oy=Hh-40;
- const s=Math.min((W-ox-30)/maxR,(oy-30)/maxH);
+ const W=cv.width,Hh=cv.height,c=calc(ang);
+ const maxR=Math.max(c.L,1),backR=Math.max(-c.L,0),maxH=Math.max(c.H,1);
+ const oy=Hh-44,ox=30+backR/(maxR+backR)*(W-60);
+ const s=Math.min((W-60)/(maxR+backR),(oy-34)/maxH);
  ctx.clearRect(0,0,W,Hh);
- ctx.strokeStyle=css('--grid');ctx.lineWidth=1;ctx.fillStyle=css('--mute');ctx.font='12px system-ui';
- const step=maxR>40?10:maxR>15?5:2;
- for(let x=-Math.floor((ox-10)/s/step)*step;x*s+ox<W;x+=step){const px=ox+x*s;ctx.beginPath();ctx.moveTo(px,10);ctx.lineTo(px,oy);ctx.stroke();ctx.fillText(x+' м',px-8,oy+16)}
- for(let y=0;oy-y*s>10;y+=step){const py=oy-y*s;ctx.beginPath();ctx.moveTo(ox-ox+10,py);ctx.lineTo(W-10,py);ctx.stroke();if(y)ctx.fillText(y+' м',2,py-3)}
- ctx.strokeStyle=css('--ink');ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(10,oy);ctx.lineTo(W-10,oy);ctx.stroke();
- ctx.fillStyle=css('--ink');ctx.fillRect(ox-8,oy-6,14,6);
- angs.forEach((a,i)=>{const c=res[i],col=css(cols[i]),Tm=c.T*prog;
-  ctx.strokeStyle=col;ctx.lineWidth=3;ctx.beginPath();
-  for(let k=0;k<=80;k++){const t=Tm*k/80,x=c.vx*t,y=c.vy*t-g*t*t/2;const px=ox+x*s,py=oy-y*s;k?ctx.lineTo(px,py):ctx.moveTo(px,py)}
-  ctx.stroke();
-  if(prog<1){const t=Tm;ctx.fillStyle=col;ctx.beginPath();ctx.arc(ox+c.vx*t*s,oy-(c.vy*t-g*t*t/2)*s,5,0,7);ctx.fill()}
-  ctx.fillStyle=col;ctx.font='bold 13px system-ui';ctx.fillText(a+'°',ox+Math.cos(a*Math.PI/180)*60+4,oy-Math.sin(a*Math.PI/180)*60-4)});
+ const step=maxR+backR>16?5:2;
+ ctx.lineWidth=1;ctx.strokeStyle='rgba(150,60,100,.18)';ctx.fillStyle='#7a3f5c';ctx.font='500 12px "JetBrains Mono",monospace';
+ for(let x=-Math.floor((ox-10)/s/step)*step;ox+x*s<W-10;x+=step){const px=ox+x*s;ctx.beginPath();ctx.moveTo(px,12);ctx.lineTo(px,oy);ctx.stroke();ctx.fillText(x,px-6,oy+20)}
+ for(let y=step;oy-y*s>12;y+=step){const py=oy-y*s;ctx.beginPath();ctx.moveTo(10,py);ctx.lineTo(W-10,py);ctx.stroke();ctx.fillText(y,12,py-4)}
+ ctx.fillText('м',W-24,oy+20);
+ ctx.strokeStyle='#4a1d33';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(10,oy);ctx.lineTo(W-10,oy);ctx.stroke();
+ const gr=ctx.createLinearGradient(ox,0,ox+Math.max(c.L,1)*s,0);gr.addColorStop(0,'#c2255c');gr.addColorStop(1,'#e64980');
+ const Tm=c.T*prog,pts=[];
+ for(let k=0;k<=90;k++){const t=Tm*k/90;pts.push([ox+c.vx*t*s,oy-(c.vy*t-g*t*t/2)*s])}
+ ctx.lineCap='round';ctx.lineWidth=5;ctx.strokeStyle=backR>0?'#e64980':gr;ctx.beginPath();
+ pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+ ctx.fillStyle='#c2255c';
+ for(let k=3;k<pts.length;k+=6){ctx.globalAlpha=.5;ctx.beginPath();ctx.arc(pts[k][0]+4,pts[k][1]+5,2.5,0,7);ctx.fill()}
+ ctx.globalAlpha=1;
+ if(prog<1&&pts.length){const p=pts[pts.length-1];ctx.fillStyle='#fff';ctx.strokeStyle='#c2255c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p[0],p[1],7,0,7);ctx.fill();ctx.stroke()}
+ const r=ang*Math.PI/180;
+ ctx.save();ctx.translate(ox,oy);ctx.rotate(-r);ctx.fillStyle='#4a1d33';ctx.fillRect(-4,-5,34,10);ctx.restore();
+ ctx.fillStyle='#4a1d33';ctx.beginPath();ctx.arc(ox,oy,9,0,7);ctx.fill();
 }
-function anim(){const t0=performance.now(),dur=2500;prog=0;cancelAnimationFrame(raf);
+function anim(){const t0=performance.now(),dur=2200;prog=0;cancelAnimationFrame(raf);
  (function f(n){prog=Math.min((n-t0)/dur,1);draw();if(prog<1)raf=requestAnimationFrame(f)})(t0)}
-const legEl=document.getElementById('leg');
-function leg(){legEl.innerHTML=`<span><i style="background:var(--c30)"></i>${angs[0]}°</span>`}
-document.getElementById('ang').oninput=e=>{angs[0]=+e.target.value;document.getElementById('av').textContent=e.target.value;prog=1;leg();table(10);draw()};
+document.getElementById('ang').oninput=e=>{ang=+e.target.value;document.getElementById('av').textContent=ang;cancelAnimationFrame(raf);prog=1;stats();draw()};
 document.getElementById('play').onclick=anim;
-matchMedia('(prefers-color-scheme:dark)').onchange=()=>{table(+vIn.value);draw()};
-leg();table(10);draw();
+matchMedia('(prefers-color-scheme:dark)').onchange=draw;
+stats();draw();
+for(let i=0;i<14;i++){const e=document.createElement('div'),z=8+Math.random()*8;e.className='petal';e.style.cssText=`left:${Math.random()*100}%;width:${z}px;height:${z*1.3}px;animation-duration:${9+Math.random()*10}s;animation-delay:${-Math.random()*18}s`;document.body.appendChild(e)}
 </script>
 </body>
 </html>
