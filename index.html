@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Полёт струи под углом</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef3f6;--card:#fff;--ink:#12263a;--mute:#5b6f80;--line:#cdd8e0;--c30:#1f77b4;--c60:#d9480f;--c99:#2f9e44;--grid:#dde6ec}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a24;--card:#152532;--ink:#e6eef4;--mute:#93a7b6;--line:#294052;--c30:#5aa9e6;--c60:#ff8a5c;--c99:#69db7c;--grid:#1f3444}}
+:root[data-theme="dark"]{--bg:#0e1a24;--card:#152532;--ink:#e6eef4;--mute:#93a7b6;--line:#294052;--c30:#5aa9e6;--c60:#ff8a5c;--c99:#69db7c;--grid:#1f3444}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:860px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:1.6rem;margin:0 0 4px;line-height:1.2}
+h2{font-size:1.15rem;margin:0 0 8px}
+.sub{color:var(--mute);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+canvas{width:100%;height:auto;display:block;border-radius:6px}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:10px;font-family:system-ui,sans-serif;font-size:.95rem}
+.ctl input[type=range]{flex:1;min-width:160px}
+button{font:inherit;font-family:system-ui,sans-serif;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--c30);outline-offset:2px}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-family:system-ui,sans-serif;font-size:.9rem;margin-top:8px}
+.leg i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.9rem;min-width:480px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+.law{margin:0 0 12px}
+.f{font-family:"Cambria Math",Georgia,serif;font-size:1.05rem;background:var(--bg);padding:6px 10px;border-radius:6px;display:block;margin:4px 0;overflow-x:auto;white-space:nowrap}
+.note{color:var(--mute);font-size:.92rem}
+footer{text-align:center;font-weight:bold;padding:14px;border:2px solid var(--ink);border-radius:10px;margin-top:20px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1>Зависимость полёта струи от угла наклона</h1>
+<p class="sub">Струя вылетает из сопла под выбранным углом к горизонту. Сопротивлением воздуха пренебрегаем.</p>
+
+<section class="card">
+<canvas id="cv" width="800" height="440" aria-label="Траектории струи"></canvas>
+<div class="leg" id="leg"></div>
+<div class="ctl">
+<span>Скорость v₀ = <b>10 м/с</b> (постоянная)</span>
+<input id="v" type="hidden" value="10">
+<label for="ang">Угол наклона: <b id="av">45</b>°</label>
+<input id="ang" type="range" min="0" max="180" step="1" value="45">
+<button id="play">Запустить струю</button>
+</div>
+</section>
+
+<section class="card">
+<h2>Результаты расчёта</h2>
+<div class="tw"><table>
+<thead><tr><th>Угол</th><th>Время полёта, с</th><th>Макс. высота, м</th><th>Дальность по x, м</th></tr></thead>
+<tbody id="tb"></tbody></table></div>
+<p class="note">При 90° струя бьёт строго вверх и падает обратно (дальность 0). При углах больше 90° струя летит назад, и дальность отрицательна. Наибольшая дальность на ровной земле — при 45°; 30° и 60° дают одинаковую дальность (углы в сумме 90°).</p>
+</section>
+
+<section class="card">
+<h2>Физические законы и формулы</h2>
+<div class="law"><b>1. Второй закон Ньютона.</b> Единственная сила, действующая на частицу воды в полёте, — сила тяжести, поэтому ускорение постоянно:
+<span class="f">F = m·a,  a<sub>x</sub> = 0,  a<sub>y</sub> = −g,  g ≈ 9,81 м/с²</span></div>
+<div class="law"><b>2. Принцип независимости движений (Галилей).</b> Движение по горизонтали и по вертикали происходит независимо. Начальная скорость раскладывается на составляющие:
+<span class="f">v₀ₓ = v₀·cos α,  v₀ᵧ = v₀·sin α</span></div>
+<div class="law"><b>3. Равномерное движение по горизонтали:</b>
+<span class="f">x = v₀·cos α · t</span></div>
+<div class="law"><b>4. Равноускоренное движение по вертикали:</b>
+<span class="f">y = v₀·sin α · t − g·t²/2,   v<sub>y</sub> = v₀·sin α − g·t</span></div>
+<div class="law"><b>5. Уравнение траектории</b> (исключаем t) — парабола:
+<span class="f">y = x·tg α − g·x² / (2·v₀²·cos²α)</span></div>
+<div class="law"><b>6. Характеристики полёта:</b>
+<span class="f">t = 2·v₀·sin α / g</span>
+<span class="f">H = v₀²·sin²α / (2g)</span>
+<span class="f">L = v₀²·sin 2α / g</span></div>
+<div class="law"><b>7. Закон сохранения механической энергии.</b> Без трения полная энергия частицы постоянна:
+<span class="f">m·v₀²/2 = m·v²/2 + m·g·y</span></div>
+<div class="law"><b>8. Закон Паскаля / уравнение Бернулли</b> объясняют начальную скорость струи из сопла: давление в жидкости превращается в кинетическую энергию, v₀ = √(2Δp/ρ).</div>
+</section>
+
+<footer>Работа обучающегося 1 курса группы 1РУПО2 Мысенко Дмитрия</footer>
+</main>
+<script>
+const g=9.81,cols=['--c30'],angs=[45];
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const vIn=document.getElementById('v'),vv=document.getElementById('vv');
+let prog=1,raf=null;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function calc(v,a){const r=a*Math.PI/180,vx=v*Math.cos(r),vy=v*Math.sin(r);
+ return{vx,vy,T:2*vy/g,H:vy*vy/(2*g),L:v*v*Math.sin(2*r)/g}}
+function table(v){document.getElementById('tb').innerHTML=angs.map((a,i)=>{const c=calc(v,a);
+ return `<tr><td style="color:${css(cols[i])};font-weight:bold">${a}°</td><td>${c.T.toFixed(2)}</td><td>${c.H.toFixed(2)}</td><td>${c.L.toFixed(2)}</td></tr>`}).join('')}
+function draw(){
+ const W=cv.width,Hh=cv.height,v=+vIn.value;
+ const res=angs.map(a=>calc(v,a));
+ const maxR=Math.max(...res.map(r=>Math.max(r.L,0)),1),maxH=Math.max(...res.map(r=>r.H),1);
+ const backR=Math.max(...res.map(r=>Math.max(-r.L,0)));
+ const ox=40+backR/(maxR+backR+0.001)*0+ (backR>0?Math.min(150,W*0.2):0),oy=Hh-40;
+ const s=Math.min((W-ox-30)/maxR,(oy-30)/maxH);
+ ctx.clearRect(0,0,W,Hh);
+ ctx.strokeStyle=css('--grid');ctx.lineWidth=1;ctx.fillStyle=css('--mute');ctx.font='12px system-ui';
+ const step=maxR>40?10:maxR>15?5:2;
+ for(let x=-Math.floor((ox-10)/s/step)*step;x*s+ox<W;x+=step){const px=ox+x*s;ctx.beginPath();ctx.moveTo(px,10);ctx.lineTo(px,oy);ctx.stroke();ctx.fillText(x+' м',px-8,oy+16)}
+ for(let y=0;oy-y*s>10;y+=step){const py=oy-y*s;ctx.beginPath();ctx.moveTo(ox-ox+10,py);ctx.lineTo(W-10,py);ctx.stroke();if(y)ctx.fillText(y+' м',2,py-3)}
+ ctx.strokeStyle=css('--ink');ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(10,oy);ctx.lineTo(W-10,oy);ctx.stroke();
+ ctx.fillStyle=css('--ink');ctx.fillRect(ox-8,oy-6,14,6);
+ angs.forEach((a,i)=>{const c=res[i],col=css(cols[i]),Tm=c.T*prog;
+  ctx.strokeStyle=col;ctx.lineWidth=3;ctx.beginPath();
+  for(let k=0;k<=80;k++){const t=Tm*k/80,x=c.vx*t,y=c.vy*t-g*t*t/2;const px=ox+x*s,py=oy-y*s;k?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+  ctx.stroke();
+  if(prog<1){const t=Tm;ctx.fillStyle=col;ctx.beginPath();ctx.arc(ox+c.vx*t*s,oy-(c.vy*t-g*t*t/2)*s,5,0,7);ctx.fill()}
+  ctx.fillStyle=col;ctx.font='bold 13px system-ui';ctx.fillText(a+'°',ox+Math.cos(a*Math.PI/180)*60+4,oy-Math.sin(a*Math.PI/180)*60-4)});
+}
+function anim(){const t0=performance.now(),dur=2500;prog=0;cancelAnimationFrame(raf);
+ (function f(n){prog=Math.min((n-t0)/dur,1);draw();if(prog<1)raf=requestAnimationFrame(f)})(t0)}
+const legEl=document.getElementById('leg');
+function leg(){legEl.innerHTML=`<span><i style="background:var(--c30)"></i>${angs[0]}°</span>`}
+document.getElementById('ang').oninput=e=>{angs[0]=+e.target.value;document.getElementById('av').textContent=e.target.value;prog=1;leg();table(10);draw()};
+document.getElementById('play').onclick=anim;
+matchMedia('(prefers-color-scheme:dark)').onchange=()=>{table(+vIn.value);draw()};
+leg();table(10);draw();
+</script>
+</body>
+</html>
